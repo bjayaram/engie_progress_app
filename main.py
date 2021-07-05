@@ -156,28 +156,15 @@ class AgGridTbl(jp.AgGrid):
         print(f'input for tab_{msg.id} was changed to {self.value}')
 
 def qtab_click(self, msg):
-
-    # msg.page.delete_components(msg.page.components[1])
-    # msg.page.delete_components(msg.page.components[2])
-    
-    # jp.QDiv(text='Update Activities', a=msg.page, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
-
-    # log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=msg.page)
-    # log_out_btn.s_id = request.session_id
-
-    # def log_out(self, msg):
-    #     users[self.s_id]['logged_in'] = False
-    #     msg.page.redirect = '/login_test'
-
-    # log_out_btn.on('click', log_out)
-
     """function runs when user clicks a QTab"""
-    if (self.value[-1] == '1'):
+  
+    if self.value[-1] == '1':
         msg.page.components[3].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
         msg.page.components[4].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
     else:
         msg.page.components[3].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
         msg.page.components[4].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
+    
     print(f'tab name={self.value} was clicked' )
 
 engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
@@ -189,22 +176,37 @@ mygroup_df = engie_df[engie_df['Responsibility']=='Engie MECH']
 def percent_changed(self, msg):
     print(msg)
 
+def change_link_text(self, msg):
+    self.set_classes('text-yellow-500')   
+
+@jp.SetRoute('/dload_file')
+def save_csv(request):
+    wp = jp.WebPage()
+    wp.html = engie_df.to_html()
+    return wp
+
 @jp.SetRoute('/main')
 async def main(request):
     wp = jp.QuasarPage()
     if not request.session_id:
         wp.redirect = '/login_test'
 
-    jp.QDiv(text='Update Activities', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
+    header_div = jp.QDiv(text='Update Activities', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
+    
+    menu_div = jp.QDiv(a=wp, classes='m-2 p-2 w-1/2 full-height', style="display: flex; justify-content: flex-end")
 
-    log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=wp)
+    btns_div = jp.QDiv(a=menu_div, classes='m-1 p-1', style='float: right;')
+
+    save_csv_link = jp.A(text='Download File', href='/dload_file', download='update_data.csv', a=btns_div,
+             classes='inline-block m-2 p-2 text-blue text-2xl', style="padding: 1.5rem;")
+    save_csv_link.on('click', change_link_text)
+
+    log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=btns_div)
     log_out_btn.s_id = request.session_id
 
     def log_out(self, msg):
         users[self.s_id]['logged_in'] = False
         msg.page.redirect = '/login_test'
-
-    log_out_btn.on('click', log_out)
 
     # create tabs
     tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
@@ -223,8 +225,8 @@ async def main(request):
     mygroup.options.columnDefs[6].editable = True
 
     mygroup.on('cellValueChanged', percent_changed)
-
     tabs.on('input', qtab_click)
+    log_out_btn.on('click', log_out)
 
     tabcontent = jp.Div(a=wp)
 
