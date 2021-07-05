@@ -43,7 +43,7 @@ alert_html = """
 users = {}
 
 async def login_test(request):
-    wp = jp.QuasarPage()
+    wp = jp.WebPage()
     session_id = request.session_id
     if session_id in users:
         if users[session_id]['logged_in']:
@@ -78,12 +78,12 @@ async def login_page(request):
             return await login_test(request)
     except:
         pass
-    wp = jp.QuasarPage()
+    wp = jp.WebPage()
     wp.display_url = 'login_page'  # Sets the url to display in browser without reloading page
     jp.Div(text='Please login', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold')
     login_form = jp.parse_html(login_form_html, a=wp, classes='m-2 p-2 w-1/4')
     alert = jp.parse_html(alert_html, show=False, a=wp)
-    session_div = jp.Div(text='Session goes here', classes='m-1 p-1 text-xl', a=wp)
+    session_div = jp.Div(text='', classes='m-1 p-1 text-xl', a=wp)
     sign_in_btn = login_form.name_dict['sign_in_btn']
     sign_in_btn.user_name = login_form.name_dict['user_name']
     sign_in_btn.session_id = request.session_id
@@ -111,7 +111,9 @@ async def login_successful(wp, s_id, user):
     wp.selected_rows = {}
     users[s_id]['logged_in'] = True
     wp.display_url = 'login_successful'
-    main(wp)
+    #return await main(s_id, user)
+
+    wp.redirect = "/main"
 
 
 class AgGridTbl(jp.AgGrid):
@@ -126,16 +128,16 @@ class AgGridTbl(jp.AgGrid):
         self.options.defaultColDef.sortable = True
         self.options.defaultColDef.resizable = True
         self.options.defaultColDef.cellStyle['textAlign'] = 'center'
-        self.options.defaultColDef.headerClass = 'font-bold'
+        #self.options.defaultColDef.headerClass = 'font-bold'
 
-        # self.options.columnDefs[0].cellClass = ['text-black', 'bg-blue-500', 'hover:bg-blue-200']
-        # for col_def in self.options.columnDefs[1:]:
-        #     col_def.cellClassRules = {
-        #         'font-bold': 'x < 20',
-        #         'bg-red-300': 'x < 20',
-        #         'bg-yellow-300': 'x >= 20 && x < 50',
-        #         'bg-green-300': 'x >= 50'
-        #     }
+        self.options.columnDefs[0].cellClass = ['text-black', 'bg-blue-500', 'hover:bg-blue-200']
+        for col_def in self.options.columnDefs[1:]:
+            col_def.cellClassRules = {
+                'font-bold': 'x < 20',
+                'bg-red-300': 'x < 20',
+                'bg-yellow-300': 'x >= 20 && x < 50',
+                'bg-green-300': 'x >= 50'
+            }
 
         # self.date.on('input', self.date_change)
         # self.on('input', self.input_change)
@@ -154,13 +156,28 @@ class AgGridTbl(jp.AgGrid):
         print(f'input for tab_{msg.id} was changed to {self.value}')
 
 def qtab_click(self, msg):
+
+    # msg.page.delete_components(msg.page.components[1])
+    # msg.page.delete_components(msg.page.components[2])
+    
+    # jp.QDiv(text='Update Activities', a=msg.page, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
+
+    # log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=msg.page)
+    # log_out_btn.s_id = request.session_id
+
+    # def log_out(self, msg):
+    #     users[self.s_id]['logged_in'] = False
+    #     msg.page.redirect = '/login_test'
+
+    # log_out_btn.on('click', log_out)
+
     """function runs when user clicks a QTab"""
     if (self.value[-1] == '1'):
-        msg.page.components[1].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
-        msg.page.components[2].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
+        msg.page.components[3].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
+        msg.page.components[4].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
     else:
-        msg.page.components[1].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
-        msg.page.components[2].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
+        msg.page.components[3].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
+        msg.page.components[4].style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;"
     print(f'tab name={self.value} was clicked' )
 
 engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
@@ -172,9 +189,22 @@ mygroup_df = engie_df[engie_df['Responsibility']=='Engie MECH']
 def percent_changed(self, msg):
     print(msg)
 
+@jp.SetRoute('/main')
+async def main(request):
+    wp = jp.QuasarPage()
+    if not request.session_id:
+        wp.redirect = '/login_test'
 
-def main(wp):
-    #wp = jp.QuasarPage()
+    jp.QDiv(text='Update Activities', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
+
+    log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=wp)
+    log_out_btn.s_id = request.session_id
+
+    def log_out(self, msg):
+        users[self.s_id]['logged_in'] = False
+        msg.page.redirect = '/login_test'
+
+    log_out_btn.on('click', log_out)
 
     # create tabs
     tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 

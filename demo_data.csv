@@ -1,11 +1,11 @@
 Row,ActivityID,ActivityDesc,SLUFloc,ActivityType,Responsibility,Progress
-1,0026-0050,Mount lids,SLU-N3G-M-SA391,LA,Engie MECH,
-2,0042-0050,Close manholes elbow and venturi nozzles. Mount blind flange,SLU-N3G-M-C361,Critical,Engie MECH,
-3,0072-0070,Connecting and testing 2 level measurement,SLU-N4G-M-SR492,LA,E & I_engie,
-4,0213-0030,Replace bottom plate,SLU-N3G-M-RAF362,LA,Static Nitrate,
-5,0213-0040,Abort position submission,SLU-N3G-M-RAF362,LA,Static Nitrate,
-6,0213-0050,Manhole close inspection before closing,SLU-N3G-M-RAF362,LA,Production Nitrate,
-7,0251-0140,Fit 2 bottom roller guards TR 361,SLU-N3G-M,LA,Static Nitrate,
-8,0255-0030,Mount the handrail on the landing,SLU-N3G-M-FI371A,LA,Static Nitrate,
-9,0256-0120,Draw blind No. 2,SLU-N3G-M,"",Engie MECH,
-10,0256-0220,Draw blind No. 4,SLU-N3G-M,"",Engie MECH,
+1,0026-0050,Mount lids,SLU-N3G-M-SA391,LA,Engie MECH,10
+2,0042-0050,Close manholes elbow and venturi nozzles. Mount blind flange,SLU-N3G-M-C361,Critical,Engie MECH,15
+3,0072-0070,Connecting and testing 2 level measurement,SLU-N4G-M-SR492,LA,E & I_engie,20
+4,0213-0030,Replace bottom plate,SLU-N3G-M-RAF362,LA,Static Nitrate,25
+5,0213-0040,Abort position submission,SLU-N3G-M-RAF362,LA,Static Nitrate,30
+6,0213-0050,Manhole close inspection before closing,SLU-N3G-M-RAF362,LA,Production Nitrate,35
+7,0251-0140,Fit 2 bottom roller guards TR 361,SLU-N3G-M,LA,Static Nitrate,40
+8,0255-0030,Mount the handrail on the landing,SLU-N3G-M-FI371A,LA,Static Nitrate,45
+9,0256-0120,Draw blind No. 2,SLU-N3G-M,"",Engie MECH,50
+10,0256-0220,Draw blind No. 4,SLU-N3G-M,"",Engie MECH,55
