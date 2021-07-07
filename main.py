@@ -23,8 +23,12 @@ login_form_html = """
       </button>
     </div>
   </form>
+  <div class="m-1 p-1 text-xl">
+    <a id="4" href="https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf" target="_self" class="inline-block m-2 p-2 text-blue text-2xl" style="color: blue; padding: 1.5rem;">Hello</a>
+    <a id="5" href="https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf" target="_self" class="inline-block m-2 p-2 text-blue text-2xl" style="color: blue; padding: 1.5rem;">World</a>
+  </div>
   <p class="text-center text-gray-500 text-xs">
-    Terms and Conditions apply - https://tailwindcss.com/components/forms
+    Terms and Conditions apply
   </p>
 </div>
 """
@@ -37,6 +41,26 @@ alert_html = """
   <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
     <p>Please enter password again.</p>
   </div>
+</div>
+"""
+
+alert_dialog_html = """
+<div class="q-pa-md q-gutter-sm">
+    <q-dialog name="alert_dialog" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Alert</div>
+        </q-card-section>
+
+        <q-card-section>
+          Percent value was edited.
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 </div>
 """
 
@@ -83,6 +107,7 @@ async def login_page(request):
     jp.Div(text='Please login', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold')
     login_form = jp.parse_html(login_form_html, a=wp, classes='m-2 p-2 w-1/4')
     alert = jp.parse_html(alert_html, show=False, a=wp)
+    
     session_div = jp.Div(text='', classes='m-1 p-1 text-xl', a=wp)
     sign_in_btn = login_form.name_dict['sign_in_btn']
     sign_in_btn.user_name = login_form.name_dict['user_name']
@@ -171,9 +196,10 @@ engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
 # critical_df = engie_df[engie_df['ActivityType']=='Critical']
 # lookahead_df = engie_df[engie_df['ActivityType']=='LA']
 mygroup_df = engie_df[engie_df['Responsibility']=='Engie MECH']
-#tab_details = {'All':engie_df, 'My Group':mygroup_df, 'Critical':critical_df, 'Lookahead':lookahead_df}
 
 def percent_changed(self, msg):
+    c = jp.parse_html(alert_dialog_html, a=msg.page)
+    c.name_dict['alert_dialog'].value = True
     print(msg)
 
 def change_link_text(self, msg):
@@ -182,7 +208,7 @@ def change_link_text(self, msg):
 @jp.SetRoute('/dload_file')
 def save_csv(request):
     wp = jp.WebPage()
-    wp.html = engie_df.to_html()
+    wp.html = str(engie_df.to_csv())
     return wp
 
 @jp.SetRoute('/main')
