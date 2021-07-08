@@ -2,6 +2,8 @@ from justpy import Div
 import justpy as jp
 import pandas as pd
 
+from sql import activities, connection, user_df, engie_df
+
 login_form_html = """
 <div class="w-full max-w-xs">
   <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -23,10 +25,7 @@ login_form_html = """
       </button>
     </div>
   </form>
-  <div class="m-1 p-1 text-xl">
-    <a id="4" href="https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf" target="_self" class="inline-block m-2 p-2 text-blue text-2xl" style="color: blue; padding: 1.5rem;">Hello</a>
-    <a id="5" href="https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf" target="_self" class="inline-block m-2 p-2 text-blue text-2xl" style="color: blue; padding: 1.5rem;">World</a>
-  </div>
+
   <p class="text-center text-gray-500 text-xs">
     Terms and Conditions apply
   </p>
@@ -108,6 +107,15 @@ async def login_page(request):
     login_form = jp.parse_html(login_form_html, a=wp, classes='m-2 p-2 w-1/4')
     alert = jp.parse_html(alert_html, show=False, a=wp)
     
+    pdf_div = jp.Div(text='', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold')
+    pdf1_link = jp.A(text='PDF File1', href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf', download='update_data.csv', a=pdf_div,
+             classes='inline-block m-2 p-2 text-blue text-2xl', style="color:blue; padding: 1.5rem;")
+    pdf1_link.on('click', change_link_text)
+
+    pdf2_link = jp.A(text='PDF File2', href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf', download='update_data.csv', a=pdf_div,
+             classes='inline-block m-2 p-2 text-blue text-2xl', style="color:blue; padding: 1.5rem;")
+    pdf2_link.on('click', change_link_text)
+
     session_div = jp.Div(text='', classes='m-1 p-1 text-xl', a=wp)
     sign_in_btn = login_form.name_dict['sign_in_btn']
     sign_in_btn.user_name = login_form.name_dict['user_name']
@@ -192,15 +200,31 @@ def qtab_click(self, msg):
     
     print(f'tab name={self.value} was clicked' )
 
-engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
+#engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
 # critical_df = engie_df[engie_df['ActivityType']=='Critical']
 # lookahead_df = engie_df[engie_df['ActivityType']=='LA']
-mygroup_df = engie_df[engie_df['Responsibility']=='Engie MECH']
+mygroup_df = engie_df[engie_df['Responsibility']=='MECH']
 
 def percent_changed(self, msg):
-    c = jp.parse_html(alert_dialog_html, a=msg.page)
-    c.name_dict['alert_dialog'].value = True
-    print(msg)
+    myval = mygroup_df[mygroup_df['ActivityID']==msg.data['ActivityID']]
+    print(myval.index)
+    print(engie_df[engie_df['ActivityID']==msg.data['ActivityID']]['progress'])
+
+    # c = jp.parse_html(alert_dialog_html, a=msg.page)
+    # c.name_dict['alert_dialog'].value = True
+    engie_df.at[myval.index, 'progress'] = msg.newValue
+    print(engie_df[engie_df['ActivityID']==msg.data['ActivityID']]['progress'])
+
+    #result = connection.execute("select ActivityID from activities")
+    stmt = activities.update().\
+        where(activities.c.ActivityID == msg.data['ActivityID']).\
+        values(progress=msg.newValue)
+
+    try:
+        connection.execute(stmt)
+    except:
+        print('Error while updating mysql db')
+
 
 def change_link_text(self, msg):
     self.set_classes('text-yellow-500')   
@@ -248,7 +272,7 @@ async def main(request):
     # need to hide the table after rendering but uncommenting the next line messes up the col widths
     #mygroup.style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
 
-    mygroup.options.columnDefs[6].editable = True
+    mygroup.options.columnDefs[2].editable = True
 
     mygroup.on('cellValueChanged', percent_changed)
     tabs.on('input', qtab_click)
