@@ -207,15 +207,11 @@ mygroup_df = engie_df[engie_df['Responsibility']=='MECH']
 
 def percent_changed(self, msg):
     myval = mygroup_df[mygroup_df['ActivityID']==msg.data['ActivityID']]
-    print(myval.index)
-    print(engie_df[engie_df['ActivityID']==msg.data['ActivityID']]['progress'])
+    engie_df.at[myval.index, 'progress'] = msg.newValue
 
     # c = jp.parse_html(alert_dialog_html, a=msg.page)
     # c.name_dict['alert_dialog'].value = True
-    engie_df.at[myval.index, 'progress'] = msg.newValue
-    print(engie_df[engie_df['ActivityID']==msg.data['ActivityID']]['progress'])
 
-    #result = connection.execute("select ActivityID from activities")
     stmt = activities.update().\
         where(activities.c.ActivityID == msg.data['ActivityID']).\
         values(progress=msg.newValue)
