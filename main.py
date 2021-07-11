@@ -104,16 +104,17 @@ async def login_page(request):
     wp = jp.WebPage()
     wp.display_url = 'login_page'  # Sets the url to display in browser without reloading page
     jp.Div(text='Please login', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold')
-    login_form = jp.parse_html(login_form_html, a=wp, classes='m-2 p-2 w-1/4')
+    login_form = jp.parse_html(login_form_html, a=wp, classes='m-2 p-2 w-1/2')
     alert = jp.parse_html(alert_html, show=False, a=wp)
     
-    pdf_div = jp.Div(text='', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold')
+    pdf_div = jp.Div(text='', a=wp, classes='m-2 p-2 w-1/4', 
+            style='border: 2px solid lightblue; height: 100px; padding: 10px 0; display: flex; justify-content: center;')
     pdf1_link = jp.A(text='PDF File1', href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf', download='update_data.csv', a=pdf_div,
-             classes='inline-block m-2 p-2 text-blue text-2xl', style="color:blue; padding: 1.5rem;")
+             classes='inline-block m-2 p-2 text-blue text-xl', style="color:blue; padding: 0.5rem;")
     pdf1_link.on('click', change_link_text)
 
     pdf2_link = jp.A(text='PDF File2', href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf', download='update_data.csv', a=pdf_div,
-             classes='inline-block m-2 p-2 text-blue text-2xl', style="color:blue; padding: 1.5rem;")
+             classes='inline-block m-2 p-2 text-blue text-xl', style="color:blue; padding: 0.5rem;")
     pdf2_link.on('click', change_link_text)
 
     session_div = jp.Div(text='', classes='m-1 p-1 text-xl', a=wp)
@@ -123,11 +124,13 @@ async def login_page(request):
     sign_in_btn.alert = alert
 
     async def sign_in_click(self, msg):
-        if (login_form.name_dict['user_name'].value not in accounts.keys()):
+        
+        if (login_form.name_dict['user_name'].value not in user_df['login'].values):
             session_div.text = request.session_id + ' account not valid'
             self.alert.show = True
-        #print(eval('accounts["'+login_form.name_dict['user_name'].value+'"]'))
-        if login_form.name_dict['password'].value == eval('accounts["'+login_form.name_dict['user_name'].value+'"]'):
+
+        #if login_form.name_dict['password'].value == eval('accounts["'+login_form.name_dict['user_name'].value+'"]'):
+        if login_form.name_dict['password'].value == user_df[user_df['login']==login_form.name_dict['user_name'].value].pswd.values[0]:
             session_div.text = request.session_id + ' logged in successfully'
             self.alert.show = False
             return await login_successful(wp, request.session_id, login_form.name_dict['user_name'].value)
@@ -223,7 +226,7 @@ def percent_changed(self, msg):
 
 
 def change_link_text(self, msg):
-    self.set_classes('text-yellow-500')   
+    self.style="color:black; padding: 1.5rem;"  
 
 @jp.SetRoute('/dload_file')
 def save_csv(request):
