@@ -260,8 +260,6 @@ async def change_progress(self, msg):
         engie_df.at[myval.index, 'progress'] = msg.oldValue
         val = myval['progress'].values[0]
         await msg.page.reload()
-
-        #msg.page.components[3].load_pandas_frame(engie_df)
         print(f'Progress for Activity {msg.data.ActivityID} was changed back to {val}' )
 
 def change_link_text(self, msg):
@@ -309,15 +307,15 @@ async def main(request):
 
     all.on('cellValueChanged', change_progress)
 
-    tab2 = jp.QTab(a=tabs, name='tab_2', label='My group')
-    mygroup = AgGridTbl(a=wp, df=mygroup_df, style="height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;")    
-    # need to hide the table after rendering but uncommenting the next line messes up the col widths
-    #mygroup.style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
+    # tab2 = jp.QTab(a=tabs, name='tab_2', label='My group')
+    # mygroup = AgGridTbl(a=wp, df=mygroup_df, style="height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;")    
+    # # need to hide the table after rendering but uncommenting the next line messes up the col widths
+    # #mygroup.style = "height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: none;"
 
-    mygroup.options.columnDefs[2].editable = True
+    # mygroup.options.columnDefs[2].editable = True
 
-    mygroup.on('cellValueChanged', percent_changed)
-    tabs.on('input', qtab_click)
+    # mygroup.on('cellValueChanged', percent_changed)
+    # tabs.on('input', qtab_click)
     log_out_btn.on('click', log_out)
 
     tabcontent = jp.Div(a=wp)
