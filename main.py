@@ -64,6 +64,7 @@ alert_dialog_html = """
 """
 
 users = {}
+logins = {}
 
 async def login_test(request):
     wp = jp.WebPage()
@@ -82,6 +83,7 @@ async def login_test(request):
             log_out_btn.on('click', log_out)
 
             logged_in = True
+
         else:
             logged_in = False
     else:
@@ -130,8 +132,10 @@ async def login_page(request):
             self.alert.show = True
 
         #if login_form.name_dict['password'].value == eval('accounts["'+login_form.name_dict['user_name'].value+'"]'):
-        if login_form.name_dict['password'].value == user_df[user_df['login']==login_form.name_dict['user_name'].value].pswd.values[0]:
+        secure_user = user_df[user_df['login']==login_form.name_dict['user_name'].value]
+        if login_form.name_dict['password'].value == secure_user.pswd.values[0]:
             session_div.text = request.session_id + ' logged in successfully'
+            users[request.session_id]['group'] = secure_user.groep.values[0]
             self.alert.show = False
             return await login_successful(wp, request.session_id, login_form.name_dict['user_name'].value)
         else:
@@ -142,11 +146,15 @@ async def login_page(request):
 
     return wp
 
-async def login_successful(wp, s_id, user):
+async def login_successful(wp, s_id, sec_user):
     wp.delete_components()
     wp.selected_rows = {}
     users[s_id]['logged_in'] = True
     wp.display_url = 'login_successful'
+
+    logins[sec_user] = {}
+    logins[sec_user]['s_id'] = s_id
+    logins[sec_user]['group'] = user_df[user_df['login']==sec_user]['groep'].values[0]
     #return await main(s_id, user)
 
     wp.redirect = "/main"
@@ -224,6 +232,37 @@ def percent_changed(self, msg):
     except:
         print('Error while updating mysql db')
 
+async def change_progress(self, msg):
+
+    resp = engie_df[engie_df['ActivityID']==msg.data['ActivityID']]['Responsibility'].values[0]
+    if resp in logins:
+      if msg.data['Groep'] != logins[resp]['group']:
+        c = jp.parse_html(alert_dialog_html, a=msg.page)
+        c.name_dict['alert_dialog'].value = True
+        return
+      else:
+        myval = engie_df[engie_df['ActivityID']==msg.data['ActivityID']]
+        engie_df.at[myval.index, 'progress'] = msg.newValue
+
+        stmt = activities.update().\
+            where(activities.c.ActivityID == msg.data['ActivityID']).\
+            values(progress=msg.newValue)
+
+        try:
+            connection.execute(stmt)
+            #await msg.page.reload()
+        except:
+            print('Error while updating mysql db')
+    else:
+        c = jp.parse_html(alert_dialog_html, a=msg.page)
+        c.name_dict['alert_dialog'].value = True
+        myval = engie_df[engie_df['ActivityID']==msg.data['ActivityID']]
+        engie_df.at[myval.index, 'progress'] = msg.oldValue
+        val = myval['progress'].values[0]
+        await msg.page.reload()
+
+        #msg.page.components[3].load_pandas_frame(engie_df)
+        print(f'Progress for Activity {msg.data.ActivityID} was changed back to {val}' )
 
 def change_link_text(self, msg):
     self.style="color:black; padding: 1.5rem;"  
@@ -265,6 +304,10 @@ async def main(request):
     # Need to select this tab - the next line is temporary
     tab1.set_focus = True
     all = AgGridTbl(a=wp, df=engie_df, style="height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;")
+
+    all.options.columnDefs[1].editable = True
+
+    all.on('cellValueChanged', change_progress)
 
     tab2 = jp.QTab(a=tabs, name='tab_2', label='My group')
     mygroup = AgGridTbl(a=wp, df=mygroup_df, style="height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;display: block;")    
