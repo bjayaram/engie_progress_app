@@ -271,6 +271,10 @@ def save_csv(request):
     wp.html = str(engie_df.to_csv())
     return wp
 
+def log_out(self, msg):
+    users[self.s_id]['logged_in'] = False
+    msg.page.redirect = '/login_test'
+
 @jp.SetRoute('/main')
 async def main(request):
     wp = jp.QuasarPage()
@@ -290,9 +294,9 @@ async def main(request):
     log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=btns_div)
     log_out_btn.s_id = request.session_id
 
-    def log_out(self, msg):
-        users[self.s_id]['logged_in'] = False
-        msg.page.redirect = '/login_test'
+    # def log_out(self, msg):
+    #     users[self.s_id]['logged_in'] = False
+    #     wp.redirect = '/login_test'
 
     # create tabs
     tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
