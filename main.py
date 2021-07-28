@@ -155,7 +155,6 @@ async def login_successful(wp, s_id, sec_user):
     logins[sec_user] = {}
     logins[sec_user]['s_id'] = s_id
     logins[sec_user]['group'] = user_df[user_df['login']==sec_user]['groep'].values[0]
-    #return await main(s_id, user)
 
     wp.redirect = "/main"
 
@@ -172,32 +171,6 @@ class AgGridTbl(jp.AgGrid):
         self.options.defaultColDef.sortable = True
         self.options.defaultColDef.resizable = True
         self.options.defaultColDef.cellStyle['textAlign'] = 'center'
-        #self.options.defaultColDef.headerClass = 'font-bold'
-
-        self.options.columnDefs[0].cellClass = ['text-black', 'bg-blue-500', 'hover:bg-blue-200']
-        for col_def in self.options.columnDefs[1:]:
-            col_def.cellClassRules = {
-                'font-bold': 'x < 20',
-                'bg-red-300': 'x < 20',
-                'bg-yellow-300': 'x >= 20 && x < 50',
-                'bg-green-300': 'x >= 50'
-            }
-
-        # self.date.on('input', self.date_change)
-        # self.on('input', self.input_change)
-
-    @staticmethod
-    def date_change(self, msg):
-        parent = self.parent
-        self.parent.value = self.value
-        self.parent.date.value = self.value
-
-    @staticmethod
-    def input_change(self, msg):
-        self.date.value = self.value
-        #save the value
-        #datesetting['tab_'+msg.id] = self.value
-        print(f'input for tab_{msg.id} was changed to {self.value}')
 
 def qtab_click(self, msg):
     """function runs when user clicks a QTab"""
@@ -271,14 +244,17 @@ def save_csv(request):
     wp.html = str(engie_df.to_csv())
     return wp
 
-def log_out(self, msg):
-    users[self.s_id]['logged_in'] = False
-    msg.page.redirect = '/login_test'
+# def log_out(self, msg):
+#     wp = jp.WebPage()
+#     users[self.s_id]['logged_in'] = False
+#     wp.redirect = '/login_test'
 
 @jp.SetRoute('/main')
 async def main(request):
     wp = jp.QuasarPage()
     if not request.session_id:
+        wp.redirect = '/login_test'
+    elif request.session_id in users and not users[request.session_id]['logged_in']:
         wp.redirect = '/login_test'
 
     header_div = jp.QDiv(text='Update Activities', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
@@ -294,9 +270,9 @@ async def main(request):
     log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=btns_div)
     log_out_btn.s_id = request.session_id
 
-    # def log_out(self, msg):
-    #     users[self.s_id]['logged_in'] = False
-    #     wp.redirect = '/login_test'
+    def log_out(self, msg):
+        users[self.s_id]['logged_in'] = False
+        wp.redirect = '/login_test'
 
     # create tabs
     # tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
@@ -338,7 +314,7 @@ async def main(request):
     # tabs.on('input', qtab_click)
     log_out_btn.on('click', log_out)
 
-    tabcontent = jp.Div(a=wp)
+    #tabcontent = jp.Div(a=wp)
 
     return wp
 
