@@ -214,10 +214,10 @@ def qtab_click(self, msg):
 #engie_df = pd.read_csv('demo_data.csv', encoding="ISO-8859-1")
 # critical_df = engie_df[engie_df['ActivityType']=='Critical']
 # lookahead_df = engie_df[engie_df['ActivityType']=='LA']
-mygroup_df = engie_df[engie_df['Responsibility']=='MECH']
+#mygroup_df = engie_df[engie_df['Responsibility']=='MECH']
 
 def percent_changed(self, msg):
-    myval = mygroup_df[mygroup_df['ActivityID']==msg.data['ActivityID']]
+    myval = engie_df[engie_df['ActivityID']==msg.data['ActivityID']]
     engie_df.at[myval.index, 'progress'] = msg.newValue
 
     # c = jp.parse_html(alert_dialog_html, a=msg.page)
@@ -299,14 +299,30 @@ async def main(request):
     #     wp.redirect = '/login_test'
 
     # create tabs
-    tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
-                    align='justify', narrow_indicator=True, dense=True)
+    # tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
+    #                 align='justify', narrow_indicator=True, dense=True)
 
-    tab1 = jp.QTab(a=tabs, name='tab_1', label='All')
-    # Need to select this tab - the next line is temporary
-    tab1.set_focus = True
+    # tab1 = jp.QTab(a=tabs, name='tab_1', label='All')
+    # # Need to select this tab - the next line is temporary
+    # tab1.set_focus = True
     all = AgGridTbl(a=wp, df=engie_df, style="height: 99vh; width: 99%; margin: 0.25rem; padding: 0.25rem;")
 
+
+    # The next line was an attempt to change cell class based on value of different column in same row
+    # However, it doesn't seem to work
+    #all.options.columnDefs[1].cellClassRules = {'bg-yellow-300': 'all.options.rowData.Responsibility in logins'}
+
+    all.theme = 'ag-theme-material'
+    #all.options.rowStyle['background'] = 'grey'
+
+    for row in all.options.rowData:
+      resp = row['Responsibility']
+      if resp in logins:
+        #print (row)
+        p = row['progress']
+        row['progress'] = f'<div class="text-red bg-yellow">{p}</div>'
+
+    all.html_columns = [1]      
     all.options.columnDefs[1].editable = True
 
     all.on('cellValueChanged', change_progress)
