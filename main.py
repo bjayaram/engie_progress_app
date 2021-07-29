@@ -289,14 +289,14 @@ async def main(request):
     #all.options.columnDefs[1].cellClassRules = {'bg-yellow-300': 'all.options.rowData.Responsibility in logins'}
 
     all.theme = 'ag-theme-material'
-    #all.options.rowStyle['background'] = 'grey'
+    all.options.rowStyle['background'] = 'light-grey'
 
     for row in all.options.rowData:
       resp = row['Responsibility']
-      if resp in logins:
+      if resp not in logins:
         #print (row)
         p = row['progress']
-        row['progress'] = f'<div class="text-red bg-yellow">{p}</div>'
+        row['progress'] = f'<div class="text-white bg-red"> {p} </div>'
 
     all.html_columns = [1]      
     all.options.columnDefs[1].editable = True
