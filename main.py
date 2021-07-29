@@ -289,7 +289,13 @@ async def main(request):
     #all.options.columnDefs[1].cellClassRules = {'bg-yellow-300': 'all.options.rowData.Responsibility in logins'}
 
     all.theme = 'ag-theme-material'
-    all.options.rowStyle['background'] = 'light-grey'
+    all.options.rowStyle['background'] = 'rgba(243, 244, 246, 1)'
+
+    # The next block was an attempt to use rowClassRules based on value of column in rendered row
+    # However, it doesn't seem to work
+    # resp = list(logins.keys())[0]
+    # all.options.rowClassRules = {
+    #     'rag-green': f'data.Responsibility = "{resp}"'}
 
     for row in all.options.rowData:
       resp = row['Responsibility']
