@@ -312,8 +312,8 @@ async def main(request):
         #row['progress'] = f'<div class="text-white bg-red"> {p} </div>'
         row['progress'] = f'<a href="#" onclick="return false;", class="text-white bg-red", style="padding: 10px;">{p}</a>'
 
-    all.html_columns = [1]      
-    all.options.columnDefs[1].editable = True
+    all.html_columns = [2]      
+    all.options.columnDefs[2].editable = True
 
     all.on('cellValueChanged', change_progress)
 
