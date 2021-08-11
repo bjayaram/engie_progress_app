@@ -244,7 +244,13 @@ def save_csv(request):
     wp.html = str(engie_df.to_csv())
     return wp
 
-# def log_out(self, msg):
+@jp.SetRoute('/uneditable')
+def noedit(request):
+    wp = jp.WebPage()
+    wp.html = '<h5>ERROR: You cannot edit that field.</h5>'
+    return wp
+
+# async def log_out(self, msg):
 #     wp = jp.WebPage()
 #     users[self.s_id]['logged_in'] = False
 #     wp.redirect = '/login_test'
@@ -257,7 +263,7 @@ async def main(request):
     elif request.session_id in users and not users[request.session_id]['logged_in']:
         wp.redirect = '/login_test'
 
-    header_div = jp.QDiv(text='Update Activities', a=wp, classes='m-2 p-2 w-1/4 text-xl font-semibold', style='text-align: center; font-size: large;')
+    header_div = jp.H4(text='Update Activities', a=wp, style='text-align: center; margin-top: 10px; margin-bottom: 10px;')
     
     menu_div = jp.QDiv(a=wp, classes='m-2 p-2 w-1/2 full-height', style="display: flex; justify-content: flex-end")
 
@@ -266,13 +272,14 @@ async def main(request):
     save_csv_link = jp.A(text='Download File', href='/dload_file', download='update_data.csv', a=btns_div,
              classes='inline-block m-2 p-2 text-blue text-2xl', style="padding: 1.5rem;")
     save_csv_link.on('click', change_link_text)
-
-    log_out_btn = jp.QButton(text='Logout', classes=jp.Styles.button_bordered + ' text-black m-1 p-1', style='align: right;', a=btns_div)
-    log_out_btn.s_id = request.session_id
-
+    
     def log_out(self, msg):
         users[self.s_id]['logged_in'] = False
         wp.redirect = '/login_test'
+
+    log_out_btn = jp.QBtn(label='Logout', icon="exit_to_app", click=log_out, a=btns_div)
+    log_out_btn.s_id = request.session_id
+
 
     # create tabs
     # tabs = jp.QTabs(a=wp, classes='text-white shadow-2 q-mb-md', style="background-color: #00305e;", 
@@ -302,7 +309,8 @@ async def main(request):
       if resp not in logins:
         #print (row)
         p = row['progress']
-        row['progress'] = f'<div class="text-white bg-red"> {p} </div>'
+        #row['progress'] = f'<div class="text-white bg-red"> {p} </div>'
+        row['progress'] = f'<a href="#" onclick="return false;", class="text-white bg-red", style="padding: 10px;">{p}</a>'
 
     all.html_columns = [1]      
     all.options.columnDefs[1].editable = True
