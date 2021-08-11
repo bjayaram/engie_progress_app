@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Table, MetaData
 import pandas as pd
 
-keep_columns = ['ActivityID',  'ACtivityDesc', 'progress' ,  'kiritsch' ,  'Groep' ,  'Responsibility' , 
+keep_columns = ['ActivityID',  'ActivityDesc', 'progress' ,  'kiritsch' ,  'Groep' ,  'Responsibility' , 
                  'startdatum', 'einddatum', 'Lijn' ,   'LA' ,  'PreDesc' ]
 
 try:
