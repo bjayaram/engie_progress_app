@@ -8,7 +8,7 @@ First, make sure that the version of `python3` you have is 3.6 or higher:
 If not, upgrade your Python interpreter.
 
 It is probably best to run the programs in this tutorial in a virtual environment so that your system wide Python interpreter is not affected, though this is not a requirement.
-The following commands create a directory for this tutorial, then create a virtual environment named jp and activate it and finally install JustPy and its dependencies:
+The following commands create a directory for this app, then create a virtual environment named jp and activate it and finally install JustPy and its dependencies:
 
 ```
 $ mkdir progressapp
@@ -45,7 +45,7 @@ This refers to port 8000 on the local machine and should work in most environmen
 # Deployment to a cloud service (Google, AWS, Digital Ocean etc.)
 
 If you need a public URL to access this app,
-Launch a Linux Virtual Machine on your preferred cloud service.
+launch a Linux Virtual Machine on your preferred cloud service.
 
 If you are not a superuser, become one. 
 
