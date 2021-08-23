@@ -250,18 +250,13 @@ def noedit(request):
     wp.html = '<h5>ERROR: You cannot edit that field.</h5>'
     return wp
 
-# async def log_out(self, msg):
-#     wp = jp.WebPage()
-#     users[self.s_id]['logged_in'] = False
-#     wp.redirect = '/login_test'
-
 @jp.SetRoute('/main')
 async def main(request):
     wp = jp.QuasarPage()
-    if not request.session_id:
-        wp.redirect = '/login_test'
+    if not users or request.session_id not in users:
+      wp.redirect = '/login_test'
     elif request.session_id in users and not users[request.session_id]['logged_in']:
-        wp.redirect = '/login_test'
+      wp.redirect = '/login_test'
 
     header_div = jp.H4(text='Update Activities', a=wp, style='text-align: center; margin-top: 10px; margin-bottom: 10px;')
     
@@ -275,6 +270,7 @@ async def main(request):
     
     def log_out(self, msg):
         users[self.s_id]['logged_in'] = False
+        wp.delete_components()
         wp.redirect = '/login_test'
 
     log_out_btn = jp.QBtn(label='Logout', icon="exit_to_app", click=log_out, a=btns_div)
